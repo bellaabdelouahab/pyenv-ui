@@ -1,0 +1,142 @@
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 10;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #4a4a4a;
+    -fx-background-radius: 5em;
+}
+
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 5em;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0 5 0 5;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+}
+
+/* Set a smooth and modern font for the entire application */
+.root {
+    -fx-font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Center the main label */
+.label-main {
+    -fx-alignment: center;
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+}
+
+/* Style for section labels */
+.label-section {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+    -fx-padding: 10 0 10 0;
+}
+
+/* Style for buttons */
+.button {
+    -fx-background-color: #2c2c2c;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-padding: 10 20 10 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 0);
+    -fx-font-size: 14px;
+}
+
+.button:hover {
+    -fx-background-color: #3c3c3c;
+    -fx-cursor: hand;
+}
+
+/* Style for installed versions */
+.installed-version {
+    -fx-background-color: #4caf50; /* Green background */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Style for available versions */
+.available-version {
+    -fx-background-color: #555555; /* Dark gray background */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Style for selected version */
+.selected-version {
+    -fx-background-color: #2196F3; /* Blue background */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+/* Style for separator label */
+.separator-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-padding: 10 0 10 0;
+}
+
+/* Improve VBox alignment and spacing */
+#avaialeversions {
+    -fx-alignment: top-center;
+    -fx-spacing: 10;
+    -fx-padding: 10;
+}
+
+/* Style for TableView */
+.table-view {
+    -fx-background-color: #3e3e3e;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #2e2e2e;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-size: 30px;
+}
+
+.table-view .table-row-cell {
+    -fx-hover-background-color: #4a4a4a;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: white;
+}
+
+.table-view .table-column {
+    -fx-alignment: CENTER_LEFT;
+}
+
+/* Alternate row colors */
+.table-view .table-row-cell:filled:odd {
+    -fx-background-color: #3e3e3e;
+}
+
+.table-view .table-row-cell:filled:even {
+    -fx-background-color: #2e2e2e;
+}
