@@ -46,6 +46,7 @@
                 <!-- Search Bar for Packages with Install Button -->
                 <HBox spacing="10">
                     <TextField fx:id="packageSearchField" promptText="Search Packages" HBox.hgrow="ALWAYS" />
+                    <TextField fx:id="packageVersionField" prefHeight="25.0" prefWidth="134.0" promptText="Version : default latest" />
                     <Button fx:id="installPackageButton" disable="true" onAction="#handleInstallPackageButton" prefWidth="140.0" styleClass="button" text="Install Package" />
                 </HBox>
 
@@ -77,5 +78,5 @@
     </HBox>
 
     <!-- Status Bar -->
-    <Label fx:id="statusLabel" alignment="TOP_CENTER" contentDisplay="TOP" layoutX="20.0" layoutY="755.0" prefHeight="43.0" prefWidth="1219.0" style="-fx-text-fill: white; -fx-padding: 5; -fx-border-color: red; -fx-border-radius: 5;" text="Ready" textFill="#6b6565" />
+    <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="TOP" layoutX="20.0" layoutY="755.0" prefHeight="43.0" prefWidth="1219.0" style="-fx-text-fill: white; -fx-padding: 5; -fx-border-color: green; -fx-border-radius: 5;" text="Ready" textFill="#6b6565" />
 </Pane>

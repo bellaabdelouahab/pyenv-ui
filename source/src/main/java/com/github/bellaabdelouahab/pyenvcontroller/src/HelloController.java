@@ -4,6 +4,8 @@ import com.github.bellaabdelouahab.pyenvcontroller.utils.PyenvUtils;
 
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.github.bellaabdelouahab.pyenvcontroller.utils.PackageUtils;
@@ -19,6 +21,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
 public class HelloController {
+    private static final Logger LOGGER = Logger.getLogger(HelloController.class.getName());
+
     @FXML
     private VBox avaialeversions;
 
@@ -36,6 +40,9 @@ public class HelloController {
 
     @FXML
     private TextField packageSearchField;
+
+    @FXML
+    private TextField packageVersionField;
 
     @FXML
     private VBox packageVBox;
@@ -59,6 +66,7 @@ public class HelloController {
 
     @FXML
     public void initialize() {
+        LOGGER.info("Initializing HelloController...");
         loadPythonVersions();
         // Apply styling
         String css = this.getClass().getResource("/com/github/bellaabdelouahab/pyenvcontroller/src/styles.css").toExternalForm();
@@ -66,11 +74,6 @@ public class HelloController {
         scrollPanePackages.getStylesheets().add(css);
         avaialeversions.setSpacing(5); // Add spacing between buttons
         avaialeversions.setPadding(new javafx.geometry.Insets(10)); // Add padding around buttons
-
-        // Initialize package list view
-        if (packageVBox.getChildren().isEmpty()) {
-            packageVBox.getChildren().add(UIUtils.createHeaderRow());
-        }
         
         // Add listeners for search fields if implementing search functionality
         versionSearchField.textProperty().addListener((observable, oldValue, newValue) -> filterAvailableVersions(newValue));
@@ -78,19 +81,21 @@ public class HelloController {
 
         // Initialize switch button
         switchButton.setOnAction(e -> handleSwitchButton());
+        LOGGER.info("HelloController initialized successfully.");
     }
 
     private void loadPythonVersions() {
-        System.out.println("Loading Python versions...");
+        LOGGER.info("Loading Python versions...");
         installedVersions = PyenvUtils.getInstalledVersions();
-        System.out.println("Installed Versions: " + installedVersions);
+        LOGGER.info("Installed Versions: " + installedVersions);
         availableVersions = PyenvUtils.getAvailableVersions();
-        System.out.println("Available Versions: " + availableVersions);
+        LOGGER.info("Available Versions: " + availableVersions);
 
         displayPythonVersions(installedVersions, availableVersions);
     }
 
     private void displayPythonVersions(Set<String> installedVersions, List<String> availableVersions) {
+        LOGGER.info("Displaying Python versions...");
         avaialeversions.getChildren().clear(); // Clear existing buttons
 
         // Add installed versions first
@@ -99,11 +104,17 @@ public class HelloController {
             avaialeversions.getChildren().add(versionButton);
         }
 
+        // Filter out installed versions from available versions
+        List<String> filteredAvailableVersions = availableVersions.stream()
+                .filter(version -> !installedVersions.contains(version))
+                .collect(Collectors.toList());
+
         // Add available versions
-        for (String version : availableVersions) {
+        for (String version : filteredAvailableVersions) {
             Button versionButton = createVersionButton(version, false);
             avaialeversions.getChildren().add(versionButton);
         }
+        LOGGER.info("Python versions displayed successfully.");
     }
 
     private Button createVersionButton(String version, boolean isInstalled) {
@@ -122,6 +133,7 @@ public class HelloController {
     }
 
     private void selectVersion(String version, Button button) {
+        LOGGER.info("Selecting version: " + version);
         // Deselect previously selected button
         if (selectedVersion != null) {
             for (javafx.scene.Node node : avaialeversions.getChildren()) {
@@ -138,11 +150,12 @@ public class HelloController {
         // Select the new version
         selectedVersion = version;
         button.getStyleClass().add("selected-version");
-        System.out.println("Selected version: " + selectedVersion);
+        LOGGER.info("Selected version: " + selectedVersion);
         listInstalledPackages(); // Invoke the method to list packages
     }
 
     private void listInstalledPackages() {
+        LOGGER.info("Listing installed packages for version: " + selectedVersion);
         packages = PackageUtils.listInstalledPackages(selectedVersion);
 
         // Update the VBox on the JavaFX Application Thread
@@ -154,10 +167,12 @@ public class HelloController {
                 packageVBox.getChildren().add(row);
             }
             statusLabel.setText("Packages loaded for version " + selectedVersion);
+            LOGGER.info("Installed packages listed successfully.");
         });
     }
 
     private void filterAvailableVersions(String query) {
+        LOGGER.info("Filtering available versions with query: " + query);
         List<String> filteredAvailableVersions = availableVersions.stream()
                 .filter(version -> version.toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toList());
@@ -166,31 +181,36 @@ public class HelloController {
     }
 
     private void filterPackages(String query) {
+        LOGGER.info("Filtering packages with query: " + query);
         ObservableList<Package> filteredPackages = packages.stream()
                 .filter(pkg -> pkg.getName().toLowerCase().contains(query.toLowerCase()))
                 .collect(Collectors.toCollection(FXCollections::observableArrayList));
 
         // Update the VBox on the JavaFX Application Thread
         javafx.application.Platform.runLater(() -> {
-            // Clear existing package rows, but keep the header row
-            packageVBox.getChildren().removeIf(node -> node != packageVBox.getChildren().get(0));
+            // Clear all existing package rows
+            packageVBox.getChildren().clear();
             for (Package pkg : filteredPackages) {
                 HBox row = UIUtils.createPackageRow(pkg.getName(), pkg.getVersion());
                 packageVBox.getChildren().add(row);
             }
 
-            // Enable or disable the install package button based on search results
-            installPackageButton.setDisable(!filteredPackages.isEmpty() || packageSearchField.getText().trim().isEmpty());
+            // Enable or disable the install package button based on exact match
+            boolean exactMatch = filteredPackages.stream()
+                    .anyMatch(pkg -> pkg.getName().equalsIgnoreCase(packageSearchField.getText().trim()) &&
+                            pkg.getVersion().equalsIgnoreCase(packageVersionField.getText().trim()));
+            installPackageButton.setDisable(exactMatch || packageSearchField.getText().trim().isEmpty());
         });
     }
 
     @FXML
     private void handleInstallButton() {
         if (selectedVersion == null) {
+            LOGGER.warning("No version selected for installation.");
             System.out.println("No version selected for installation.");
             return;
         }
-        System.out.println("Install button clicked for version: " + selectedVersion);
+        LOGGER.info("Install button clicked for version: " + selectedVersion);
         PyenvUtils.installVersion(selectedVersion);
         // Deselect after installation
         selectedVersion = null;
@@ -200,6 +220,7 @@ public class HelloController {
     @FXML
     private void handleSwitchButton() {
         if (selectedVersion == null) {
+            LOGGER.warning("No version selected to switch.");
             System.out.println("No version selected to switch.");
             statusLabel.setText("No version selected to switch.");
             return;
@@ -211,12 +232,54 @@ public class HelloController {
     @FXML
     private void handleInstallPackageButton() {
         String packageName = packageSearchField.getText().trim();
+        String packageVersion = packageVersionField.getText().trim();
         if (packageName.isEmpty()) {
             statusLabel.setText("Please enter a package name to install.");
             return;
         }
-        String result = PackageUtils.installPackage(selectedVersion, packageName);
-        statusLabel.setText(result);
+
+        // Check if the package with the same version is already installed
+        boolean exactMatch = packages.stream()
+                .anyMatch(pkg -> pkg.getName().equalsIgnoreCase(packageName) &&
+                        pkg.getVersion().equalsIgnoreCase(packageVersion));
+
+        if (exactMatch) {
+            statusLabel.setText("Package " + packageName + " version " + packageVersion + " is already installed.");
+            return;
+        }
+
+        // Check if the package with a different version is installed
+        Package installedPackage = packages.stream()
+                .filter(pkg -> pkg.getName().equalsIgnoreCase(packageName))
+                .findFirst()
+                .orElse(null);
+
+        if (installedPackage != null) {
+            // Uninstall the existing package
+            String uninstallResult = PackageUtils.uninstallPackage(selectedVersion, packageName);
+            if (!uninstallResult.contains("successfully")) {
+                statusLabel.setText("Failed to uninstall existing package " + packageName + ": " + uninstallResult);
+                return;
+            }
+        }
+
+        // Install the new package version or latest if version is empty
+        String installResult;
+        if (packageVersion.isEmpty()) {
+            installResult = PackageUtils.installPackage(selectedVersion, packageName);
+        } else {
+            installResult = PackageUtils.installPackage(selectedVersion, packageName + "==" + packageVersion);
+        }
+
+        if (installResult.contains("successfully")) {
+            statusLabel.setText("Package " + packageName + (packageVersion.isEmpty() ? "" : " version " + packageVersion) + " installed successfully.");
+        } else {
+            // Reinstall the old package if the new installation fails
+            if (installedPackage != null) {
+                PackageUtils.installPackage(selectedVersion, packageName + "==" + installedPackage.getVersion());
+            }
+            statusLabel.setText("Failed to install package " + packageName + (packageVersion.isEmpty() ? "" : " version " + packageVersion) + ": " + installResult);
+        }
         listInstalledPackages(); // Refresh the package list
     }
 
